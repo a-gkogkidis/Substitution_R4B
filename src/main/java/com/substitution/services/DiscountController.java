@@ -33,7 +33,7 @@ public class DiscountController {
 
     @GetMapping("/equivalentMedicationList")
     public String getEquivalent(@RequestParam(required = true, name = "substance") String substance, @RequestParam(required = true, name = "doseform") String doseform, @RequestParam(required = false, name = "country") String targetCountry) {
-        String country = targetCountry.isEmpty() ? "100000072172" : targetCountry; // if targetCountry is not set, then force Estonia
+        String country = targetCountry == null || targetCountry.isEmpty() ? "100000072172" : targetCountry; // if targetCountry is not set, then force Estonia
         // Create a context
         FhirContext ctx = FhirContext.forR4B();
         // Disable server validation (don't pull the server's metadata first)
@@ -50,7 +50,8 @@ public class DiscountController {
                 .where(Ingredient.SUBSTANCE_CODE.exactly().code(substance))
                 .returnBundle(Bundle.class)
                 .execute();
-        if (ingredientResults.getTotal() != 0)
+
+        if (ingredientResults.getEntry().size() != 0) {
             for (Bundle.BundleEntryComponent entry : ingredientResults.getEntry()) {
                 Ingredient ingredient = (Ingredient) entry.getResource();
 
@@ -72,6 +73,7 @@ public class DiscountController {
 
                     // Limit data by country
                     if (code.equals(country)) {
+
                         AdministrableProductDefinition adp = client.read().resource(AdministrableProductDefinition.class).withUrl(ingredient.getFor().get(2).getReference()).execute();
                         if (adp.getAdministrableDoseForm().getCoding().get(0).getCode().equals(doseform)) {
                             mpdList.add(mpd);
@@ -79,12 +81,12 @@ public class DiscountController {
                     }
                 }
             }
-        else{
+        } else {
             // Specific Substance has zero results ex. no results for Amlodipine Besilate
             // So we need to check one level higher by ATC (or SPOR equivalent code)
 
             // get parent of requested substance
-            substance = substance.equals("100000090079")? "C08CA01" : "100000095065"; // force amlodipine either ATC or SPOR
+            substance = substance.equals("100000090079") ? "C08CA01" : "100000095065"; // force amlodipine either ATC or SPOR
             Bundle mpdResults = client
                     .search()
                     .forResource(MedicinalProductDefinition.class)
