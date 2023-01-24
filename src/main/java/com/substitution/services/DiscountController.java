@@ -24,8 +24,8 @@ public class DiscountController {
     @Autowired
     private DiscountServices discountService;
 
-    @GetMapping("/excelDiscount")
-    public ResponseEntity<SubstanceEquivalence> getIncomeAge(@RequestParam(required = true, name = "income") String substance) {
+    @GetMapping("/getEquivalentSubstance")
+    public ResponseEntity<SubstanceEquivalence> getEquivalentSubstance(@RequestParam(required = true, name = "substance") String substance) {
         SubstanceEquivalence incomeObj = new SubstanceEquivalence();
         incomeObj.set_substance(substance);
         return new ResponseEntity<SubstanceEquivalence>(discountService.discountCalculator(incomeObj), HttpStatus.OK);
@@ -86,7 +86,8 @@ public class DiscountController {
             // So we need to check one level higher by ATC (or SPOR equivalent code)
 
             // get parent of requested substance
-            substance = substance.equals("100000090079") ? "C08CA01" : "100000095065"; // force amlodipine either ATC or SPOR
+//            getEquivalentSubstance(substance).getBody().get_substance()
+            substance = getEquivalentSubstance(substance).getBody().get_response();//substance.equals("100000090079") ? "C08CA01" : "100000095065"; // force amlodipine either ATC or SPOR
             Bundle mpdResults = client
                     .search()
                     .forResource(MedicinalProductDefinition.class)
@@ -95,17 +96,20 @@ public class DiscountController {
                     .returnBundle(Bundle.class)
                     .execute();
 
+            System.out.println( mpdResults.getEntry().size());
             Collection<String> mpdIDs = new ArrayList<>();
             mpdResults.getEntry().forEach(bundleEntryComponent -> {
                 MedicinalProductDefinition mpd = (MedicinalProductDefinition) bundleEntryComponent.getResource();
                 System.out.println(mpd.getIdBase());
                 mpdIDs.add(mpd.getId());
+                mpdList.add(mpd);
             });
             Bundle adp = client.search().forResource(AdministrableProductDefinition.class)
                     .where(AdministrableProductDefinition.FORM_OF.hasAnyOfIds(mpdIDs))
                     .returnBundle(Bundle.class)
                     .execute();
-            System.out.println(ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(adp));
+
+//            System.out.println(ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(adp));
         }
 
 
