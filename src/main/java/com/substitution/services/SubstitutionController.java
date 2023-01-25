@@ -18,11 +18,11 @@ import java.util.List;
 
 
 @RestController
-public class DiscountController {
+public class SubstitutionController {
 
 
     @Autowired
-    private DiscountServices discountService;
+    private SubstitutionServices discountService;
 
     @GetMapping("/getEquivalentSubstance")
     public ResponseEntity<SubstanceEquivalence> getEquivalentSubstance(@RequestParam(required = true, name = "substance") String substance) {

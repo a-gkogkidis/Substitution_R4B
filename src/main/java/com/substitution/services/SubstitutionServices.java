@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class DiscountServices {
+public class SubstitutionServices {
 
         @Value("${kie.containerId}")
         private String containerId;
