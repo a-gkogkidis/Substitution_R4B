@@ -222,7 +222,7 @@ public class SubstitutionController {
 
     @RequestMapping(value = "/medicinalproducts", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public String getEquivalent2(@RequestParam(required = true, name = "substance") String _substance, @RequestParam(required = true, name = "doseform") String _doseform, @RequestParam(required = false, name = "country") String targetCountry,
+    public String getEquivalent2(@RequestParam(name = "substance") String _substance, @RequestParam(name = "doseform") String _doseform, @RequestParam(required = false, name = "country") String targetCountry,
                                  @RequestParam(required = false, name = "strength") String _strength,
                                  @RequestParam(required = false, name = "productname") String _productname) {
         String country = targetCountry == null || targetCountry.isEmpty() ? "100000072172" : targetCountry; // if targetCountry is not set, then force Estonia
@@ -301,7 +301,6 @@ public class SubstitutionController {
             String substance2 = ing2.getSubstance().getCode().getConcept().getCoding().get(0).getCode();
 
             if (substance1.equals(_substance) && substance1.equals(substance2)) {
-//                System.out.println("debug 1");
                 return 1;
             } else
                 return -1;
