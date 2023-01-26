@@ -6,6 +6,7 @@ import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import com.substitution.utils.helper.SubstanceEquivalence;
 import org.hl7.fhir.r4b.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -96,19 +98,27 @@ public class SubstitutionController {
                     .returnBundle(Bundle.class)
                     .execute();
 
-            System.out.println( mpdResults.getEntry().size());
-            Collection<String> mpdIDs = new ArrayList<>();
+            System.out.println(mpdResults.getEntry().size());
+            HashMap<String, MedicinalProductDefinition> _mpds = new HashMap<>();
             mpdResults.getEntry().forEach(bundleEntryComponent -> {
                 MedicinalProductDefinition mpd = (MedicinalProductDefinition) bundleEntryComponent.getResource();
-                System.out.println(mpd.getIdBase());
-                mpdIDs.add(mpd.getId());
-                mpdList.add(mpd);
+//                System.out.println(mpd.getIdElement().getIdPart());
+                _mpds.put(mpd.getIdElement().getIdPart(), mpd);
             });
+
             Bundle adp = client.search().forResource(AdministrableProductDefinition.class)
-                    .where(AdministrableProductDefinition.FORM_OF.hasAnyOfIds(mpdIDs))
+                    .where(AdministrableProductDefinition.FORM_OF.hasAnyOfIds(_mpds.keySet()))
+                    .and(AdministrableProductDefinition.DOSE_FORM.exactly().code(doseform))
                     .returnBundle(Bundle.class)
                     .execute();
-
+            System.out.println(adp.getEntry().size());
+            adp.getEntry().forEach(bundleEntryComponent -> {
+                AdministrableProductDefinition apd = (AdministrableProductDefinition) bundleEntryComponent.getResource();
+                System.out.println(apd.getFormOf().get(0));
+//                if (apd.getFormOf().get(0)) {
+//                    mpdList.add(_mpds.get());
+//                }
+            });
 //            System.out.println(ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(adp));
         }
 
