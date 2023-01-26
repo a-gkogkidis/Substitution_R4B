@@ -8,6 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
+/*
+* TODO: use this class to return the response to client.
+*/
 public class MedicationKnowledgeResponse {
 
         private Boolean success;
