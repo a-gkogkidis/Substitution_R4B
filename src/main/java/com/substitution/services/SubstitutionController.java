@@ -3,6 +3,7 @@ package com.substitution.services;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
+import com.substitution.utils.DoseformConversions;
 import com.substitution.utils.helper.SubstanceEquivalence;
 import org.hl7.fhir.r4b.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -235,6 +236,10 @@ public class SubstitutionController {
 
         // The list with the medicines to return
         HashMap<String, MedicinalProductDefinition> mpdList = new HashMap<>();
+        String doseForm = _doseform;
+        if (_doseform.length() == 8) {
+            doseForm = DoseformConversions.getInstance().getSPOR(_doseform);
+        }
 
         // Specific Substance has zero results ex. no results for Amlodipine Besilate
         // So we need to check one level higher by ATC (or SPOR equivalent code)
@@ -262,7 +267,7 @@ public class SubstitutionController {
         // Check if for the given MPDs and the dose form there are any results.
         Bundle adp = client.search().forResource(AdministrableProductDefinition.class)
                 .where(AdministrableProductDefinition.FORM_OF.hasAnyOfIds(_mpds.keySet()))
-                .and(AdministrableProductDefinition.DOSE_FORM.exactly().code(_doseform))
+                .and(AdministrableProductDefinition.DOSE_FORM.exactly().code(doseForm))
                 .returnBundle(Bundle.class)
                 .execute();
 
