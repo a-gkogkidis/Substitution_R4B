@@ -1,6 +1,6 @@
-package com.substitution.services;
+package com.gnomon.substitution.services;
 
-import com.substitution.utils.helper.SubstanceEquivalence;
+import com.gnomon.substitution.utils.helper.SubstanceEquivalence;
 import lombok.extern.slf4j.Slf4j;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
@@ -42,10 +42,12 @@ public class SubstitutionServices {
         public SubstanceEquivalence discountCalculator (SubstanceEquivalence incomeObj) {
             SubstanceEquivalence response = null;
 
+            // TODO: Need to find a better way to use the connection with the KIE server
+            kieServicesClient.activateContainer(containerId);
             RuleServicesClient client = kieServicesClient.getServicesClient(RuleServicesClient.class);
 
-            List<SubstanceEquivalence> facts = new ArrayList<>();
-            facts.add(incomeObj);
+//            List<SubstanceEquivalence> facts = new ArrayList<>();
+//            facts.add(incomeObj);
 
             //BatchExecutionCommand batchExecutionCommand = batchCommand(incomeObj);
             Command<?> batchCommand = prepareCommands(incomeObj, "gnomon", outIdentifier);
@@ -57,10 +59,13 @@ public class SubstitutionServices {
                 log.info("Commands executed with success! Response: ");
                 log.info(result.getMsg());
                 log.info("{}", result.getResult());
+                System.out.println(results.size());
                 response = (SubstanceEquivalence) results.get(0);
             } else {
                 System.out.println("Something went wrong!!");
             }
+
+            kieServicesClient.deactivateContainer(containerId);
             return response;
         }
 

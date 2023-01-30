@@ -1,6 +1,6 @@
-package com.substitution;
+package com.gnomon.substitution;
 
-import com.substitution.utils.DoseformConversions;
+import com.gnomon.substitution.utils.DoseformConversions;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

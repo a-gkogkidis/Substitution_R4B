@@ -1,14 +1,12 @@
-package com.substitution.utils;
+package com.gnomon.substitution.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.substitution.utils.helper.Doseforms;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

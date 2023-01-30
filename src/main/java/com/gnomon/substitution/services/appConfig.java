@@ -1,4 +1,4 @@
-package com.substitution.services;
+package com.gnomon.substitution.services;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;

@@ -1,4 +1,4 @@
-package com.substitution.utils.helper;
+package com.gnomon.substitution.utils.helper;
 
 import lombok.Getter;
 import lombok.Setter;
